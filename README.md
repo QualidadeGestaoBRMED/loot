@@ -36,3 +36,13 @@ A contribuição é encorajada para qualquer trecho de código que tenha valor r
 3.  **Documentação Mínima:** Adicione uma Docstring explicando:
     * O que o código faz.
     * Quais as dependências necessárias.
+
+## 📦 Instalação
+
+Para usar o Loot no seu projeto, instale via pip apontando para a versão segura:
+
+# Via SSH (Recomendado para Devs)
+pip install git+ssh://git@github.com/QualidadeGestaoBRMED/loot.git@v0.1.0
+
+# Via HTTPS (Para Servidores/CI)
+pip install git+https://github.com/QualidadeGestaoBRMED/loot.git@v0.1.0
