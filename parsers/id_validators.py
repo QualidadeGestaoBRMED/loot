@@ -7,7 +7,7 @@ from typing import Optional
 
 class DocType(Enum):
     CPF = "CPF"
-    CNPJ = "CNPJ"  # <--- NOVO TIPO
+    CNPJ = "CNPJ"  
     PASSPORT_BR = "PASSPORT_BR"
     PASSPORT_FOREIGN = "PASSPORT_FOREIGN"
     UNKNOWN = "UNKNOWN"
@@ -32,7 +32,7 @@ def is_cpf_valid(cpf: str) -> bool:
     d2 = (soma * 10 % 11) % 10
     return d1 == int(cpf_clean[9]) and d2 == int(cpf_clean[10])
 
-def is_cnpj_valid(cnpj: str) -> bool: # <--- NOVA FUNÇÃO
+def is_cnpj_valid(cnpj: str) -> bool:
     """Valida CNPJ (14 dígitos) via Módulo 11."""
     cnpj_clean = clean_digits(cnpj)
     if len(cnpj_clean) != 14 or len(set(cnpj_clean)) == 1:
@@ -72,7 +72,7 @@ def detect_doc_type(value: str) -> DocType:
     if len(digits_only) == 11:
         return DocType.CPF
     
-    if len(digits_only) == 14: # <--- DETECÇÃO CNPJ
+    if len(digits_only) == 14:
         return DocType.CNPJ
 
     # Prioridade 2: Passaporte BR
@@ -105,12 +105,11 @@ def process_document(value: str) -> dict:
         if result["is_valid"]:
             result["formatted"] = f"{clean[:3]}.{clean[3:6]}.{clean[6:9]}-{clean[9:]}"
 
-    elif doc_type == DocType.CNPJ: # <--- TRATAMENTO CNPJ
+    elif doc_type == DocType.CNPJ:
         result["is_valid"] = is_cnpj_valid(value)
         clean = clean_digits(value)
         result["clean_value"] = clean
         if result["is_valid"]:
-            # Formato: 12.345.678/0001-90
             result["formatted"] = f"{clean[:2]}.{clean[2:5]}.{clean[5:8]}/{clean[8:12]}-{clean[12:]}"
 
     elif doc_type == DocType.PASSPORT_BR:
