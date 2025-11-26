@@ -31,6 +31,6 @@ jobs:
       - name: Publicar no GitHub Packages
         env:
           TWINE_USERNAME: ${{ github.actor }}
-          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          TWINE_PASSWORD: ${{ secrets.PAT_TOKEN }}
         run: |
           twine upload --repository-url https://pypi.pkg.github.com/qualidadegestaobrmed dist/*
