@@ -1,32 +1,36 @@
-name: Publicar Pacote Loot
+name: Publicar Pacote Loot (Estável)
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  publish:
+  publish-gpr:
     runs-on: ubuntu-latest
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
 
-      - name: Instalar uv
-        uses: astral-sh/setup-uv@v1
+      - name: Instalar Python
+        uses: actions/setup-python@v5
         with:
-          version: "0.5.1"
-          enable-cache: true
+          python-version: '3.10'
 
-      - name: Construir pacote
-        run: uv build
+      - name: Instalar dependências de build
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Construir o pacote
+        run: python -m build
 
       - name: Publicar no GitHub Packages
-        run: uv publish
         env:
-          UV_PUBLISH_URL: https://pypi.pkg.github.com/QualidadeGestaoBRMED
-          UV_PUBLISH_USERNAME: ${{ github.actor }}
-          UV_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          TWINE_USERNAME: ${{ github.actor }}
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          twine upload --repository-url https://pypi.pkg.github.com/QualidadeGestaoBRMED dist/*
