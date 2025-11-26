@@ -1,12 +1,35 @@
 [project]
-name = "loot"
+name = "qegloot"
 version = "0.1.0"
-description = "Repositório central de ativos de automação e bibliotecas compartilhadas."
+description = "Repositorio central de ativos de automacao e bibliotecas compartilhadas"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = [
-    "pandas",   
-    "requests",
+license = { text = "MIT" }
+authors = [
+    { name = "QualidadeGestaoBRMED" }
+]
+keywords = ["automation", "validators", "parsers", "cpf", "cnpj"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+# Dependencias opcionais para casos especificos
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "ruff>=0.1",
+]
+# Adicione aqui quando precisar de pandas/requests em algum modulo
+data = [
+    "pandas>=2.0",
+    "requests>=2.31",
 ]
 
 [build-system]
@@ -18,3 +41,4 @@ packages = ["loot"]
 
 [project.urls]
 Repository = "https://github.com/QualidadeGestaoBRMED/loot"
+Issues = "https://github.com/QualidadeGestaoBRMED/loot/issues"

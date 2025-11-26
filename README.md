@@ -39,10 +39,52 @@ A contribuição é encorajada para qualquer trecho de código que tenha valor r
 
 ## 📦 Instalação
 
-Para usar o Loot no seu projeto, instale via pip apontando para a versão segura:
+### Via PyPI (Recomendado)
 
-# Via SSH (Recomendado para Devs)
-pip install git+ssh://git@github.com/QualidadeGestaoBRMED/loot.git@v0.1.0
+```bash
+# Com UV (recomendado)
+uv add qegloot
 
-# Via HTTPS (Para Servidores/CI)
-pip install git+https://github.com/QualidadeGestaoBRMED/loot.git@v0.1.0
+# Com pip tradicional
+pip install qegloot
+```
+
+### Via GitHub (Desenvolvimento)
+
+```bash
+# Versão específica
+uv pip install git+https://github.com/QualidadeGestaoBRMED/loot.git@v0.1.0
+
+# Última versão da main
+uv pip install git+https://github.com/QualidadeGestaoBRMED/loot.git
+```
+
+### Instalação local (Contribuidores)
+
+```bash
+# Clone o repositório
+git clone https://github.com/QualidadeGestaoBRMED/loot.git
+cd loot
+
+# Instale em modo editable com dependências de desenvolvimento
+uv venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+uv pip install -e ".[dev]"
+```
+
+## 🚀 Uso Rápido
+
+```python
+from loot.parsers import process_document, is_cpf_valid
+
+# Processar e validar CPF
+result = process_document("123.456.789-09")
+print(result)
+# {'original_input': '123.456.789-09', 'type': 'CPF',
+#  'is_valid': True, 'clean_value': '12345678909',
+#  'formatted': '123.456.789-09'}
+
+# Validação direta
+if is_cpf_valid("12345678909"):
+    print("CPF válido!")
+```
