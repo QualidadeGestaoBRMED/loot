@@ -17,6 +17,9 @@ jobs:
 
       - name: Instalar uv
         uses: astral-sh/setup-uv@v1
+        with:
+          version: "0.5.0"
+          enable-cache: true
 
       - name: Construir pacote
         run: uv build
