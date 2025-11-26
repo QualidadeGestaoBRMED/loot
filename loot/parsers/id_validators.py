@@ -1,9 +1,17 @@
 import re
 import json
 from enum import Enum
-from typing import Optional
+from typing import Optional, TypedDict
 
 # --- 1. Definições ---
+
+class DocumentResult(TypedDict):
+    """Resultado do processamento de documento."""
+    original_input: str
+    type: str
+    is_valid: bool
+    clean_value: Optional[str]
+    formatted: Optional[str]
 
 class DocType(Enum):
     CPF = "CPF"
@@ -87,7 +95,7 @@ def detect_doc_type(value: str) -> DocType:
 
 # --- 4. O Maestro (Processamento) ---
 
-def process_document(value: str) -> dict:
+def process_document(value: str) -> DocumentResult:
     doc_type = detect_doc_type(value)
     
     result = {

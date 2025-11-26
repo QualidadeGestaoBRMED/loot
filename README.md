@@ -1,18 +1,18 @@
 # loot
-steal like an artist :)
 
-**Repositório central de ativos de automação e bibliotecas compartilhadas.**
+Repositório central de ativos de automação e bibliotecas compartilhadas.
 
-Este projeto materializa a filosofia *"Steal Like An Artist"*: nosso objetivo é consolidar o conhecimento técnico da equipe em um único lugar, evitando retrabalho e elevando a barra técnica dos nossos projetos individuais.
+Consolida o conhecimento técnico da equipe em um único lugar, evitando retrabalho entre projetos.
 
-## 🎯 Propósito
-Atualmente operamos em projetos distintos, mas os desafios técnicos de automação (Auth, ETL, Integrações) são recorrentes. O **Loot** serve para:
+## Propósito
 
-1.  **Aceleração:** Reduzir o *time-to-delivery* reutilizando módulos já testados.
-2.  **Padronização:** Estabelecer padrões de código para problemas comuns antes da migração para Squads.
-3.  **Segurança:** Centralizar implementações robustas (ex: tratamento correto de credenciais e retries).
+Desafios técnicos de automação (Auth, ETL, Integrações) se repetem entre projetos. Este repositório centraliza essas soluções para:
 
-## 📂 Estrutura
+1. Reduzir retrabalho reutilizando código já testado
+2. Padronizar implementações recorrentes
+3. Centralizar práticas de segurança (credenciais, retries, etc)
+
+## Estrutura
 O repositório organiza soluções agnósticas ao cliente/projeto:
 
 * `/auth`: Módulos de autenticação (OAuth2 flows, gestão de tokens, cookies sessions).
@@ -21,58 +21,73 @@ O repositório organiza soluções agnósticas ao cliente/projeto:
 * `/helpers`: Utilitários de infraestrutura (Loggers, Decorators de retry, Tratamento de exceção).
 * `/scaffolds`: Estruturas base para iniciar novos bots ou automações.
 
-## 🛠 Guia de Contribuição
+## Guia de Contribuição
 
-A contribuição é encorajada para qualquer trecho de código que tenha valor reutilizável.
+Contribua com qualquer código reutilizável: funções genéricas, classes utilitárias ou scripts de configuração.
 
-### O que trazer para cá?
-* Funções genéricas que você escreveu para um projeto específico.
-* Classes utilitárias que resolveram um problema complexo.
-* Scripts de configuração que economizam tempo.
+### Requisitos
+1. **Sanitização:** Remova credenciais e dados sensíveis. Use variáveis de ambiente (`os.getenv`).
+2. **Desacoplamento:** O código deve funcionar fora do contexto original.
+3. **Documentação:** Adicione docstring explicando o que faz e suas dependências.
+4. **Type Hints:** Adicione type hints em todas as funções.
 
-### Requisitos Básicos
-1.  **Sanitização:** Remova **qualquer** credencial, chave de API ou dado sensível de cliente. Use variáveis de ambiente (`os.getenv`).
-2.  **Desacoplamento:** O código deve funcionar fora do contexto do seu projeto original.
-3.  **Documentação Mínima:** Adicione uma Docstring explicando:
-    * O que o código faz.
-    * Quais as dependências necessárias.
+### Type Hints
 
-## 📦 Instalação
+O pacote inclui suporte completo a type hints (`py.typed`). Ao adicionar código:
 
-### Via PyPI (Recomendado)
+```python
+from typing import TypedDict
+
+# Com type hints
+def validar_email(email: str) -> bool:
+    """Valida formato de email."""
+    return "@" in email
+
+# Retorno complexo com TypedDict
+class ResultadoValidacao(TypedDict):
+    valido: bool
+    mensagem: str
+
+def processar_dados(valor: str) -> ResultadoValidacao:
+    return {"valido": True, "mensagem": "OK"}
+
+# Evitar: sem type hints
+def validar_email(email):
+    return "@" in email
+```
+
+O arquivo `py.typed` já está configurado. Basta adicionar type hints (`param: tipo` e `-> tipo_retorno`) em funções novas. Use TypedDict para dicts de retorno complexos.
+
+## Instalação
+
+### Via PyPI
 
 ```bash
-# Com UV (recomendado)
+# Com UV
 uv add qegloot
 
-# Com pip tradicional
+# Com pip
 pip install qegloot
 ```
 
-### Via GitHub (Desenvolvimento)
+### Via GitHub
 
 ```bash
-# Versão específica
 uv pip install git+https://github.com/QualidadeGestaoBRMED/loot.git@v0.1.0
-
-# Última versão da main
 uv pip install git+https://github.com/QualidadeGestaoBRMED/loot.git
 ```
 
-### Instalação local (Contribuidores)
+### Instalação local
 
 ```bash
-# Clone o repositório
 git clone https://github.com/QualidadeGestaoBRMED/loot.git
 cd loot
-
-# Instale em modo editable com dependências de desenvolvimento
 uv venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 uv pip install -e ".[dev]"
 ```
 
-## 🚀 Uso Rápido
+## Uso
 
 ```python
 from loot.parsers import process_document, is_cpf_valid

@@ -4,6 +4,7 @@ Modulo de parsers e validadores de dados.
 
 from .id_validators import (
     DocType,
+    DocumentResult,
     clean_digits,
     clean_alphanumeric,
     is_cpf_valid,
@@ -16,6 +17,7 @@ from .id_validators import (
 
 __all__ = [
     "DocType",
+    "DocumentResult",
     "clean_digits",
     "clean_alphanumeric",
     "is_cpf_valid",
