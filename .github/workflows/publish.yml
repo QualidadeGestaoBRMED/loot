@@ -4,9 +4,6 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -14,7 +11,8 @@ jobs:
       name: pypi
       url: https://pypi.org/p/qegloot
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      contents: read      # Para fazer checkout do código
+      id-token: write     # Para Trusted Publishing no PyPI
 
     steps:
       - name: Checkout code
