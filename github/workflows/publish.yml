@@ -1,0 +1,29 @@
+name: Publicar Pacote Loot
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v1
+
+      - name: Construir pacote
+        run: uv build
+
+      - name: Publicar no GitHub Packages
+        run: uv publish
+        env:
+          UV_PUBLISH_URL: https://pypi.pkg.github.com/QualidadeGestaoBRMED
+          UV_PUBLISH_USERNAME: ${{ github.actor }}
+          UV_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
