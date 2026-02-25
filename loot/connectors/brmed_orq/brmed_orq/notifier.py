@@ -7,15 +7,14 @@ from dataclasses import dataclass
 from typing import Optional, Dict, Any
 
 
-_ALLOWED_STATUS = {"success", "failed", "warning", "error"}
+_ALLOWED_STATUS = {"success", "failed", "warning"}
 
 
 def normalize_status(status: str) -> str:
     s = (status or "").strip().lower()
     if s not in _ALLOWED_STATUS:
         return "failed"
-    return "failed" if s == "error" else s
-
+    return s
 
 def map_exit_code_to_status(rc: int) -> str:
     # 0 = success ; 1 = warning ; outros = failed
@@ -28,17 +27,17 @@ def map_exit_code_to_status(rc: int) -> str:
 
 def default_summary(status: str) -> str:
     if status == "success":
-        return "Processo finalizado com sucesso"
+        return "SUCCESS"
     if status == "warning":
-        return "Processo finalizado com aviso"
-    return "Processo finalizado com falha"
+        return "WARNING"
+    return "FAILED"
 
 
 @dataclass
 class OrchestratorClientConfig:
     notify_url: str
     job_token: str
-    timeout_seconds: int = 15
+    timeout_seconds: int = 60
     max_log_chars: int = 2000
 
 

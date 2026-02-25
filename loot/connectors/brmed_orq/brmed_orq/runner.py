@@ -96,7 +96,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     # log_summary = tudo (prioriza stderr)
     log_summary = (proc.stderr or proc.stdout or "").strip()
     if not log_summary:
-        log_summary = f"Processo finalizado com status={status}"
+        log_summary = f"--{status}--"
 
     # error_message = curto (só quando falhar)
     error_message = ""
