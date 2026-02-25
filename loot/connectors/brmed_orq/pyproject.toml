@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brmed-orq"
+version = "0.1.0"
+description = "Biblioteca para notificação de execução de jobs para orquestrador (API + CLI runner)."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+brmed-orq-run = "brmed_orq.runner:main"
+
+[tool.setuptools]
+packages = ["brmed_orq"]
