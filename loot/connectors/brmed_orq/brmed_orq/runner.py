@@ -21,6 +21,7 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     p.add_argument("--max-log-chars", type=int, default=int(os.environ.get("ORQ_MAX_LOG_CHARS", "2000")))
     p.add_argument("--status-on-rc1", default="warning", choices=["warning", "failed"], help="Como tratar RC=1")
     p.add_argument("--no-notify", action="store_true", help="Executa sem notificar (debug)")
+    p.add_argument("--quiet", action="store_true", help="Não imprime logs no console (apenas captura).")
     p.add_argument("--", dest="double_dash", action="store_true", help=argparse.SUPPRESS)
 
     # Tudo após o '--' (ou o restante) vira comando
@@ -50,13 +51,18 @@ def _extract_error_message(stderr: str, stdout: str, max_len: int) -> str:
     if not lines:
         return ""
 
-    # Preferir linha com SyntaxError / ModuleNotFoundError etc. (geralmente a última linha)
     for l in reversed(lines):
         if "SyntaxError" in l:
             return l[:max_len]
 
-    # fallback: última linha costuma ser a mensagem do erro
     return lines[-1][:max_len]
+
+
+def _tail_append(buf: str, chunk: str, max_len: int) -> str:
+    buf = buf + chunk
+    if len(buf) <= max_len:
+        return buf
+    return buf[-max_len:]
 
 
 def main(argv: Optional[List[str]] = None) -> None:
@@ -79,30 +85,45 @@ def main(argv: Optional[List[str]] = None) -> None:
         notifier.start()
     else:
         notifier = None
-        cfg = None  # type: ignore[assignment]
 
     t0 = time.monotonic()
 
-    # Executa e captura saída: SyntaxError e import errors viram stderr + rc != 0
-    proc = subprocess.run(args.cmd, capture_output=True, text=True)
+    # Executa e ESPELHA a saída no console (e captura um tail para notificação)
+    proc = subprocess.Popen(
+        args.cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,  # junta stderr no stdout (ordem mais previsível)
+        text=True,
+        bufsize=1,
+        universal_newlines=True,
+    )
+
+    captured = ""
+    assert proc.stdout is not None
+    for line in proc.stdout:
+        if not args.quiet:
+            print(line, end="")  # mostra em tempo real no console
+        captured = _tail_append(captured, line, args.max_log_chars)
+
+    rc = proc.wait()
 
     duration = int(round(time.monotonic() - t0))
-    status = map_exit_code_to_status(proc.returncode)
+    status = map_exit_code_to_status(rc)
 
     # opção: rc=1 pode ser tratado como failed dependendo do seu padrão
-    if proc.returncode == 1 and args.status_on_rc1 == "failed":
+    if rc == 1 and args.status_on_rc1 == "failed":
         status = "failed"
 
-    # log_summary = tudo (prioriza stderr)
-    log_summary = (proc.stderr or proc.stdout or "").strip()
+    # log_summary = tail capturado (stdout+stderr)
+    log_summary = captured.strip()
     if not log_summary:
         log_summary = f"--{status}--"
 
     # error_message = curto (só quando falhar)
     error_message = ""
     if status != "success":
-        max_len = args.max_log_chars
-        error_message = _extract_error_message(proc.stderr or "", proc.stdout or "", max_len)
+        # como stderr está junto, usa log_summary como fonte
+        error_message = _extract_error_message(log_summary, "", args.max_log_chars)
 
     # truncagem e notify
     if notifier is not None:
@@ -118,4 +139,4 @@ def main(argv: Optional[List[str]] = None) -> None:
             error_message=error_message or None,
         )
 
-    raise SystemExit(proc.returncode)
+    raise SystemExit(rc)
