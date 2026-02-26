@@ -45,3 +45,6 @@ packages = ["loot"]
 [project.urls]
 Repository = "https://github.com/QualidadeGestaoBRMED/loot"
 Issues = "https://github.com/QualidadeGestaoBRMED/loot/issues"
+
+[project.scripts]
+brmed-orq-run = "loot.connectors.brmed_orq.brmed_orq.runner:main"
