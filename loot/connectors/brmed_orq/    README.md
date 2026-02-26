@@ -8,7 +8,7 @@ A seguir está uma documentação objetiva dos dois modos de uso da lib `brmed-o
 ## Instalação (dev)
 
 ```bash
-pip install -e .
+pip install -U qegloot
 ```
 
 ## 1) Modo A - Notificar pelo RC (`start.sh` / wrapper externo)
