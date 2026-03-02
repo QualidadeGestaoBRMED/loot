@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+import traceback
 import time
 from typing import List, Optional
 
@@ -87,25 +88,49 @@ def main(argv: Optional[List[str]] = None) -> None:
         notifier = None
 
     t0 = time.monotonic()
-
-    # Executa e ESPELHA a saída no console (e captura um tail para notificação)
-    proc = subprocess.Popen(
-        args.cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,  # junta stderr no stdout (ordem mais previsível)
-        text=True,
-        bufsize=1,
-        universal_newlines=True,
-    )
-
     captured = ""
-    assert proc.stdout is not None
-    for line in proc.stdout:
-        if not args.quiet:
-            print(line, end="")  # mostra em tempo real no console
-        captured = _tail_append(captured, line, args.max_log_chars)
+    # Fallback para cenários em que o processo nem chega a iniciar.
+    rc = 2
 
-    rc = proc.wait()
+    try:
+        # Executa e ESPELHA a saída no console (e captura um tail para notificação).
+        proc = subprocess.Popen(
+            args.cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,  # junta stderr no stdout (ordem mais previsível)
+            text=True,
+            bufsize=1,
+            universal_newlines=True,
+        )
+
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            if not args.quiet:
+                print(line, end="")  # mostra em tempo real no console
+            captured = _tail_append(captured, line, args.max_log_chars)
+
+        rc = proc.wait()
+    except FileNotFoundError as exc:
+        # Código 127 segue convenção de "comando não encontrado".
+        rc = 127
+        msg = f"Falha ao iniciar comando: {exc}\n"
+        if not args.quiet:
+            print(msg, end="")
+        captured = _tail_append(captured, msg, args.max_log_chars)
+    except PermissionError as exc:
+        # Código 126 segue convenção de "comando encontrado, mas não executável".
+        rc = 126
+        msg = f"Falha ao executar comando (permissão): {exc}\n"
+        if not args.quiet:
+            print(msg, end="")
+        captured = _tail_append(captured, msg, args.max_log_chars)
+    except Exception:
+        # Mantém rastreio no summary para diagnóstico sem interromper a notificação.
+        rc = 2
+        trace = traceback.format_exc()
+        if not args.quiet:
+            print(trace, end="")
+        captured = _tail_append(captured, trace, args.max_log_chars)
 
     duration = int(round(time.monotonic() - t0))
     status = map_exit_code_to_status(rc)

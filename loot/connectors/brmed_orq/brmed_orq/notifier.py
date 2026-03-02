@@ -37,7 +37,7 @@ def default_summary(status: str) -> str:
 class OrchestratorClientConfig:
     notify_url: str
     job_token: str
-    timeout_seconds: int = 60
+    timeout_seconds: int = 300
     max_log_chars: int = 2000
 
 
@@ -229,6 +229,7 @@ class OrchestratorNotifier:
         cmd = [
             "curl",
             "-sS",
+            "--fail-with-body", # testar caso dê algum problema no backend (ex.: 400) e ainda assim enviar o log_summary para diagnóstico
             "-X",
             "POST",
             self.config.notify_url,
